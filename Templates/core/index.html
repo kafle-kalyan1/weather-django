@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Data</title>
+</head>
+<body>
+    <h1>Weather Data</h1>
+    <form method="GET" action="">
+      <input type="text" name="location" placeholder="Search...">
+      <button type="submit">Search</button>
+    </form>
+    <table>
+        <tr>
+            <th>Date/Time</th>
+            <th>Temperature (K)</th>
+            <th>Feels Like (K)</th>
+            <th>Min Temperature (K)</th>
+            <th>Max Temperature (K)</th>
+            <th>Pressure</th>
+            <th>Humidity (%)</th>
+            <th>Description</th>
+            <th>Icon</th>
+        </tr>
+        {% for data in weather_data.list %}
+        <tr>
+            <td>{{ data.dt_txt }}</td>
+            <td>{{ data.main.temp }}</td>
+            <td>{{ data.main.feels_like }}</td>
+            <td>{{ data.main.temp_min }}</td>
+            <td>{{ data.main.temp_max }}</td>
+            <td>{{ data.main.pressure }}</td>
+            <td>{{ data.main.humidity }}</td>
+            <td>{{ data.weather.0.description }}</td>
+            <td><img src="http://openweathermap.org/img/w/{{ data.weather.0.icon }}.png" alt="Weather Icon"></td>
+        </tr>
+        {% endfor %}
+        
+    </table>
+</body>
+</html>
