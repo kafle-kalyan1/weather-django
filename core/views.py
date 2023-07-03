@@ -2,7 +2,7 @@ import requests
 import pip._vendor.requests 
 from django.shortcuts import render
 
-API_KEY = 'afcde0ca355ba4fe4fc0947b41892bf0'
+API_KEY = 'PLEASE ENTER YOUR API KEY HERE'
 
 def get_weather_data(city):
     url = f"http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={API_KEY}"
