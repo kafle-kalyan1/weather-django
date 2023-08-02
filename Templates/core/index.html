@@ -1,40 +1,202 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Weather Data</title>
-</head>
-<body>
+  </head>
+  <style>
+    /* Reset some default styles for consistency */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #f0f0f0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    form {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    button {
+      padding: 8px 16px;
+      font-size: 16px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #4caf50;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    img {
+      max-width: 50px;
+      height: auto;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      table {
+        font-size: 14px;
+      }
+    }
+
+    .weather-card {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 20px;
+        max-width: 400px;
+        margin: 10px auto;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        background: #fff;
+      }
+      
+      .weather-card h2 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      
+      .weather-card p {
+        font-size: 18px;
+        margin: 8px 0;
+      }
+      
+      .weather-card img {
+        width: 64px;
+        max-width: 50px;
+        height: auto;
+        margin-top: 10px;
+      }
+      
+    .toggle-buttons {
+        text-align: center;
+        margin: 10px;
+    }
+      
+      .toggle-buttons button {
+        padding: 10px 20px;
+        border: none; 
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 0 10px;
+        transition: 0.3s;
+      }
+      
+      .toggle-buttons button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+  </style>
+  <body>
     <h1>Weather Data</h1>
     <form method="GET" action="">
-      <input type="text" name="location" placeholder="Search...">
+      <input type="text" name="location" placeholder="Search..." />
       <button type="submit">Search</button>
     </form>
-    <table>
-        <tr>
-            <th>Date/Time</th>
-            <th>Temperature (K)</th>
-            <th>Feels Like (K)</th>
-            <th>Min Temperature (K)</th>
-            <th>Max Temperature (K)</th>
-            <th>Pressure</th>
-            <th>Humidity (%)</th>
-            <th>Description</th>
-            <th>Icon</th>
-        </tr>
-        {% for data in weather_data.list %}
-        <tr>
-            <td>{{ data.dt_txt }}</td>
-            <td>{{ data.main.temp }}</td>
-            <td>{{ data.main.feels_like }}</td>
-            <td>{{ data.main.temp_min }}</td>
-            <td>{{ data.main.temp_max }}</td>
-            <td>{{ data.main.pressure }}</td>
-            <td>{{ data.main.humidity }}</td>
-            <td>{{ data.weather.0.description }}</td>
-            <td><img src="http://openweathermap.org/img/w/{{ data.weather.0.icon }}.png" alt="Weather Icon"></td>
-        </tr>
-        {% endfor %}
-        
-    </table>
-</body>
+  {% if  weather_data.list|length > 1 %}
+  <div>
+    <h2 style="text-align: center;">
+        {{ location }}
+    </h2>
+</div>
+<div class="weather-card" id="current-weather">
+  <h2>{{ weather_data.list.0.dt_txt }}</h2>
+  <p>Temperature (°C): {{ weather_data.list.0.main.temp }}</p>
+  <p>Feels Like (°C): {{ weather_data.list.0.main.feels_like }}</p>
+  <p>Min Temperature (°C): {{ weather_data.list.0.main.temp_min }}</p>
+  <p>Max Temperature (°C): {{ weather_data.list.0.main.temp_max }}</p>
+  <p>Pressure: {{ weather_data.list.0.main.pressure }}</p>
+  <p>Humidity (%): {{ weather_data.list.0.main.humidity }}</p>
+  <p>Description: {{ weather_data.list.0.weather.0.description }}</p>
+  <img
+    src="http://openweathermap.org/img/w/{{ weather_data.list.0.weather.0.icon }}.png"
+    alt="Weather Icon"
+  />
+</div>
+<div class="toggle-buttons">
+  <button id="prev-btn" onclick="showPreviousDay()">Previous Day</button>
+  <button id="next-btn" onclick="showNextDay()">Next Day</button>
+</div>
+
+{% else %}
+<h1>
+    ERROR Location 
+</h1>
+{% endif %}
+
+
+    <script>
+      const weatherData = {{ weather_data | safe }};
+      let currentIndex = 0;
+
+      function showWeatherData(index) {
+          const weatherCard = document.getElementById('current-weather');
+          weatherCard.innerHTML = `
+              <h2>${weatherData.list[index].dt_txt}</h2>
+              <p>Temperature (°C): ${weatherData.list[index].main.temp}</p>
+              <p>Feels Like (°C): ${weatherData.list[index].main.feels_like}</p>
+              <p>Min Temperature (°C): ${weatherData.list[index].main.temp_min}</p>
+              <p>Max Temperature (°C): ${weatherData.list[index].main.temp_max}</p>
+              <p>Pressure: ${weatherData.list[index].main.pressure}</p>
+              <p>Humidity (%): ${weatherData.list[index].main.humidity}</p>
+              <p>Description: ${weatherData.list[index].weather[0].description}</p>
+              <img src="http://openweathermap.org/img/w/${weatherData.list[index].weather[0].icon}.png" alt="Weather Icon">
+          `;
+      }
+
+      function showNextDay() {
+          if (currentIndex < weatherData.list.length - 1) {
+              currentIndex++;
+              showWeatherData(currentIndex);
+          }
+      }
+
+      function showPreviousDay() {
+          if (currentIndex > 0) {
+              currentIndex--;
+              showWeatherData(currentIndex);
+          }
+      }
+    </script>
+  </body>
 </html>
